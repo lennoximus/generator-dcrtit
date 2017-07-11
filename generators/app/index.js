@@ -40,6 +40,8 @@ module.exports = class extends Generator {
       case 'JQuery':
         this.fs.copy(this.templatePath('../configs/.eslintrc.json'), this.destinationPath('.eslintrc.json'))
         this.fs.copy(this.templatePath('../configs/.gitignore'), this.destinationPath('.gitignore'))
+        this.fs.copy(this.templatePath('../configs/csscomb.json'), this.destinationPath('csscomb.json'))
+        this.fs.copy(this.templatePath('../configs/gulpfile.js'), this.destinationPath('gulpfile.js'))
         this.fs.copyTpl(
           this.templatePath('index.html'),
           this.destinationPath('src/html/index.html'),
@@ -64,6 +66,9 @@ module.exports = class extends Generator {
             'gulp-csstree': '^1.0.1',
             'gulp-rename': '^1.2.2',
             'gulp-sass': '^3.1.0'
+          },
+          dependencies: {
+            'jquery': '^3.2.1' //eslint-disable-line
           }
         }, error => {
           if (error) {
@@ -106,11 +111,11 @@ module.exports = class extends Generator {
           }
           else {
             mkdirp('src/scss/styles/pages')
-            this.fs.write('src/scss/styles/_global.scss', '* {\r\n  box-sizing: border-box;\r\n}\r\n\r\nhtml {\r\n  font-family: $f-regular;\r\n  font-size: $s-txt-main;\r\n\r\n  width: 100%;\r\n\r\n  color: $c-txt;\r\n  background-color: $c-background;\r\n}\r\n\r\nbody {\r\n  width: 100%;\r\n}\n\n.g {\n\n}')
+            this.fs.write('src/scss/styles/_global.scss', '* {\r\n  box-sizing: border-box;\r\n}\r\n\r\nhtml {\r\n  width: 100%;\r\n\r\n}\r\n\r\nbody {\r\n  width: 100%;\r\n}\n\n.g {\n\n}')
             this.fs.write('src/scss/styles/_freq.scss', '.f {\n\n}')
             this.fs.copy(this.templatePath('../utils/styles'), this.destinationPath('src/scss/utils'))
             mkdirp('src/scss/vendor')
-            this.fs.write('src/scss/index.scss', '@import \'utils\/normalize\'\r\n@import \'utils\/variables\'\r\n@import \'utils\/mixins\'\r\n@import \'utils\/fonts\'\r\n\r\n@import \'styles\/global\'\r\n@import \'styles\/freq\'')
+            this.fs.write('src/scss/index.scss', '@import \'utils\/normalize\';\r\n@import \'utils\/variables\';\r\n@import \'utils\/mixins\';\r\n@import \'utils\/fonts\';\r\n\r\n@import \'styles\/global\';\r\n@import \'styles\/freq\';')
           }
         })
 
