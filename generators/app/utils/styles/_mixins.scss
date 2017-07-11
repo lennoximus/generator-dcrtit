@@ -1,0 +1,5 @@
+@mixin med($max) {
+    @media (max-width: #{$max}px){
+        @content;
+    }
+}
