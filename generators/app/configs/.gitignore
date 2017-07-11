@@ -3,3 +3,13 @@
 .vscode
 .layouts
 node_modules
+npm-debug.log
+npm-debug*
+.DS_Store
+/.idea/
+/.idea/*
+/src/.idea/
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
