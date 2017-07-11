@@ -1,4 +1,4 @@
-# generator-dcrtit [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+# generator-dcrtit [![NPM version][npm-image]][npm-url]
 > Generator for DECART it-production
 
 ## Installation
