@@ -25,6 +25,11 @@ module.exports = class extends Generator {
         name: 'frameworkName',
         message: 'What framework would you like to use?',
         choices: ['JQuery', 'VueJS']
+      },
+      {
+        type: 'input',
+        name: 'pagesList',
+        message: 'Enter pages to generate separated by space'
       }
     ]
 
@@ -45,13 +50,13 @@ module.exports = class extends Generator {
   }
 
   install () {
-    /* If (this.props.frameworkName !== 'VueJS') {
+    if (this.props.frameworkName !== 'VueJS') {
       this.installDependencies({
         npm: true,
         bower: false,
         yarn: false
       })
-    }*/
+    }
   }
 }
 
