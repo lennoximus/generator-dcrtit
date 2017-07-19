@@ -17,7 +17,7 @@ module.exports = class extends Generator {
       {
         type: 'input',
         name: 'projectName',
-        message: 'Enter your project name',
+        message: 'Enter your project name:',
         default: this.appname
       },
       {
@@ -29,7 +29,7 @@ module.exports = class extends Generator {
       {
         type: 'input',
         name: 'pagesList',
-        message: 'Enter pages to generate separated by space'
+        message: 'Enter pages to generate separated by space:'
       }
     ]
 
