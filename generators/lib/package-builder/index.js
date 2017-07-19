@@ -27,6 +27,10 @@ const PackageBuilder = (frameworkName, projectName) => {
         'jquery': '^3.2.1' // eslint-disable-line
       }
     })
+      .then()
+      .catch(error => {
+        console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgBlue('package.json ')}file: ${chalk.red(error)}`)
+      })
   }
   else if (frameworkName === 'VueJS') {
     fsExtra.writeJson('src/package.json', {
@@ -83,11 +87,11 @@ const PackageBuilder = (frameworkName, projectName) => {
         },
         plugins: ['html']
       }
-    }, error => {
-      if (error) {
-        console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgBlue('package.json ')}file: ${chalk.red(error)}`)
-      }
     })
+      .then()
+      .catch(error => {
+        console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgBlue('package.json ')}file: ${chalk.red(error)}`)
+      })
   }
 }
 

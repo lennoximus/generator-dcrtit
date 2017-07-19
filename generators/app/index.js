@@ -38,23 +38,10 @@ module.exports = class extends Generator {
     const frameworkName = this.props.frameworkName,
           projectName = this.props.projectName
 
-    switch (frameworkName) {
-      case 'JQuery':
-        PackageBuilder(frameworkName, projectName)
-        ConfigBundler(this, frameworkName)
-        AssetsBundler(this, frameworkName)
-
-        break
-      case 'VueJS':
-        mkdirp('src')
-        PackageBuilder(frameworkName, projectName)
-        ConfigBundler(this, frameworkName)
-        AssetsBundler(this, frameworkName)
-
-        break
-      default:
-        break
-    }
+    mkdirp('src')
+    PackageBuilder(frameworkName, projectName)
+    ConfigBundler(this, frameworkName)
+    AssetsBundler(this, frameworkName)
   }
 
   install () {
