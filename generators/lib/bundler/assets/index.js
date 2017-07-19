@@ -11,7 +11,7 @@ const AssetsBundler = (generatorInstance, frameworkName) => {
         title: generatorInstance.props.projectName,
         pageName: 'main'
       })
-    if (pagesList.length !== 0) {
+    if (generatorInstance.props.pagesList.length !== 0) {
       pagesList.forEach(page => {
         generatorInstance.fs.copyTpl(generatorInstance.templatePath('index.html'),
           generatorInstance.destinationPath(`src/html/${page}.html`),
@@ -43,7 +43,7 @@ const AssetsBundler = (generatorInstance, frameworkName) => {
       .then(() => {
         mkdirp('src/scss/styles/pages')
         mkdirp('src/scss/vendor')
-        if (pagesList.length !== 0) {
+        if (generatorInstance.props.pagesList.length !== 0) {
           pagesList.forEach(page => {
             generatorInstance.fs.write(`src/scss/styles/pages/_${page}.scss`, `.p-${page} {\n\n}`)
           })
@@ -52,7 +52,7 @@ const AssetsBundler = (generatorInstance, frameworkName) => {
         generatorInstance.fs.write('src/scss/styles/_freq.scss', '.f {\n\n}')
         generatorInstance.fs.copy(generatorInstance.templatePath('../utils/styles'), generatorInstance.destinationPath('src/scss/utils'))
         generatorInstance.fs.write('src/scss/index.scss', '@import \'utils\/normalize\';\r\n@import \'utils\/variables\';\r\n@import \'utils\/mixins\';\r\n@import \'utils\/fonts\';\r\n\r\n@import \'styles\/global\';\r\n@import \'styles\/freq\';\r\n')
-        if (pagesList.length !== 0) {
+        if (generatorInstance.props.pagesList.length !== 0) {
           pagesList.forEach(page => {
             generatorInstance.fs.append('src/scss/index.scss', `@import 'styles/pages/${page}';\r\n`)
           })
@@ -77,7 +77,7 @@ const AssetsBundler = (generatorInstance, frameworkName) => {
         generatorInstance.fs.copy(generatorInstance.templatePath('vuejs/index.js'), generatorInstance.destinationPath('src/js/client/index.js'))
         generatorInstance.fs.copy(generatorInstance.templatePath('vuejs/polyfill.js'), generatorInstance.destinationPath('src/js/client/polyfill.js'))
         generatorInstance.fs.copy(generatorInstance.templatePath('vuejs/components/Index.vue'), generatorInstance.destinationPath('src/js/client/components/App.vue'))
-        if (pagesList.length !== 0) {
+        if (generatorInstance.props.pagesList.length !== 0) {
           pagesList.forEach(page => {
             generatorInstance.fs.copyTpl(generatorInstance.templatePath('vuejs/components/Page.vue'),
               generatorInstance.destinationPath(`src/js/client/components/pages/${page}.vue`),
@@ -88,7 +88,9 @@ const AssetsBundler = (generatorInstance, frameworkName) => {
             {pages: pagesList})
         }
         else {
-          generatorInstance.fs.copy(generatorInstance.templatePath('vuejs/router'), generatorInstance.destinationPath('src/js/client/router'))
+          generatorInstance.fs.copyTpl(generatorInstance.templatePath('vuejs/router/index.js'),
+            generatorInstance.destinationPath('src/js/client/router/index.js'),
+            {pages: ''})
         }
       })
       .catch(error => {
@@ -111,7 +113,7 @@ const AssetsBundler = (generatorInstance, frameworkName) => {
       .then(() => {
         mkdirp('src/scss/styles/pages')
         mkdirp('src/scss/vendor')
-        if (pagesList.length !== 0) {
+        if (generatorInstance.props.pagesList.length !== 0) {
           pagesList.forEach(page => {
             generatorInstance.fs.write(`src/scss/styles/pages/_${page}.scss`, `.p-${page} {\n\n}`)
           })
@@ -120,7 +122,7 @@ const AssetsBundler = (generatorInstance, frameworkName) => {
         generatorInstance.fs.write('src/scss/styles/_freq.scss', '.f {\n\n}')
         generatorInstance.fs.copy(generatorInstance.templatePath('../utils/styles'), generatorInstance.destinationPath('src/scss/utils'))
         generatorInstance.fs.write('src/scss/index.scss', '@import \'utils\/normalize\';\r\n@import \'utils\/variables\';\r\n@import \'utils\/mixins\';\r\n@import \'utils\/fonts\';\r\n\r\n@import \'styles\/global\';\r\n@import \'styles\/freq\';')
-        if (pagesList.length !== 0) {
+        if (generatorInstance.props.pagesList.length !== 0) {
           pagesList.forEach(page => {
             generatorInstance.fs.append('src/scss/index.scss', `@import 'styles/pages/${page}';\r\n`)
           })
