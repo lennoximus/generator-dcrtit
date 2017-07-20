@@ -1,8 +1,42 @@
 const mkdirp = require('mkdirp-promise'),
-      chalk = require('chalk')
+      chalk = require('chalk'),
+      fss = require('fs'),
+      path = require('path'),
+      GetColors = require('get-image-colors')
+
+function filterDir (startPath, filter) {
+  if (!fss.existsSync(startPath)) { //eslint-disable-line
+    console.log('No such directory found:', startPath)
+
+    return
+  }
+
+  const files = fss.readdirSync(startPath) //eslint-disable-line
+  const resultArray = []
+
+  for (let i = 0; i < files.length; i++) {
+    const filename = path.join(startPath, files[i])
+    const stat = fss.lstatSync(filename) //eslint-disable-line
+
+    if (stat.isDirectory()) {
+      filterDir(filename, filter) // Recurse
+    }
+    else if (filename.indexOf(filter) >= 0) {
+      // Console.log('-- found: ', filename.split('\\'))
+      const pathArray = filename.split('\\')
+
+      resultArray.push(pathArray[pathArray.length - 1])
+    }
+  }
+
+  if (resultArray.length !== 0) {
+    return resultArray
+  }
+}
 
 const AssetsBundler = (generatorInstance, frameworkName) => {
-  const pagesList = generatorInstance.props.pagesList.split(' ')
+  const pagesList = generatorInstance.props.pagesList.split(' '),
+        paletteArray = filterDir(generatorInstance.destinationPath(), '.png')
 
   if (frameworkName === 'JQuery') {
     generatorInstance.fs.copyTpl(generatorInstance.templatePath('index.html'),
@@ -61,6 +95,14 @@ const AssetsBundler = (generatorInstance, frameworkName) => {
       .catch(error => {
         console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgBlue('styles ')}folder: ${chalk.red(error)}`)
       })
+    if (paletteArray.length !== 0 && paletteArray !== null) {
+      paletteArray.forEach(palette => {
+        GetColors(palette)
+          .then(colors => {
+            generatorInstance.fs.append('src/scss/utils/_variables.scss', `$c-color: ${colors.map(color => color.hex())[0]};\r\n`)
+          })
+      })
+    }
   }
   else if (frameworkName === 'VueJS') {
     generatorInstance.fs.copyTpl(generatorInstance.templatePath('vuejs/index_vue.html'),
@@ -131,6 +173,14 @@ const AssetsBundler = (generatorInstance, frameworkName) => {
       .catch(error => {
         console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgBlue('styles ')}folder: ${chalk.red(error)}`)
       })
+    if (paletteArray.length !== 0 && paletteArray !== null) {
+      paletteArray.forEach(palette => {
+        GetColors(palette)
+          .then(colors => {
+            generatorInstance.fs.append('src/scss/utils/_variables.scss', `$c-color: ${colors.map(color => color.hex())[0]};\r\n`)
+          })
+      })
+    }
   }
 }
 
