@@ -1,9 +1,12 @@
 const chalk = require('chalk'),
       fsExtra = require('fs-extra')
 
-const PackageBuilder = (frameworkName, projectName) => {
+const PackageBuilder = () => {
+  const generator = global.generator,
+        {projectName, frameworkName} = generator.props
+
   if (frameworkName === 'JQuery') {
-    fsExtra.writeJson('package.json', {
+    const packageFile = {
       name: projectName,
       version: '1.0.0',
       description: '',
@@ -26,14 +29,12 @@ const PackageBuilder = (frameworkName, projectName) => {
       dependencies: {
         'jquery': '^3.2.1' // eslint-disable-line
       }
-    })
-      .then()
-      .catch(error => {
-        console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgBlue('package.json ')}file: ${chalk.red(error)}`)
-      })
+    }
+
+    generator.fs.writeJSON(generator.destinationPath('package.json'), packageFile)
   }
   else if (frameworkName === 'VueJS') {
-    fsExtra.writeJson('src/package.json', {
+    const packageFile = {
       name: projectName,
       version: '1.0.0',
       description: '',
@@ -87,11 +88,9 @@ const PackageBuilder = (frameworkName, projectName) => {
         },
         plugins: ['html']
       }
-    })
-      .then()
-      .catch(error => {
-        console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgBlue('package.json ')}file: ${chalk.red(error)}`)
-      })
+    }
+
+    generator.fs.writeJSON(generator.destinationPath('src/package.json'), packageFile)
   }
 }
 

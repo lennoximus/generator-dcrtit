@@ -1,5 +1,4 @@
 {
-  "remove-empty-rulesets": false,
   "always-semicolon": true,
   "color-case": "lower",
   "block-indent": "  ",
@@ -7,11 +6,11 @@
   "element-case": "lower",
   "eof-newline": false,
   "leading-zero": false,
-  "quotes": "single",
+  "quotes": "double",
   "sort-order-fallback": "abc",
   "space-before-colon": "",
   "space-after-colon": " ",
-  "space-before-combinator": "",
+  "space-before-combinator": " ",
   "space-after-combinator": " ",
   "space-between-declarations": "\n",
   "space-before-opening-brace": " ",
@@ -342,6 +341,9 @@
       "filter:progid:DXImageTransform.Microsoft.gradient",
       "-ms-filter:\\'progid:DXImageTransform.Microsoft.gradient",
       "text-shadow"
+    ],
+    [
+      "..."
     ]
   ]
 }

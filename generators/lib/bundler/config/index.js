@@ -1,21 +1,58 @@
 const fsExtra = require('fs-extra')
 
-const ConfigBundler = (generatorInstance, frameworkName) => {
+const ConfigBundler = () => {
+  const generator = global.generator,
+        {frameworkName} = generator.props,
+        configRootPath = {
+          global: '../configs/global/',
+          jquery: '../configs/jquery/',
+          vuejs: '../configs/vuejs/'
+        },
+        destPath = {
+          jquery: '',
+          vuejs: 'src/'
+        }
+
+  fsExtra.copy(generator.templatePath(`${configRootPath.global}.gitignore`), generator.destinationPath('.gitignore'))
   if (frameworkName === 'JQuery') {
-    fsExtra.copy(generatorInstance.templatePath('../configs/.eslintrc.json'), generatorInstance.destinationPath('.eslintrc.json'))
-    fsExtra.copy(generatorInstance.templatePath('../configs/.gitignore'), generatorInstance.destinationPath('.gitignore'))
-    fsExtra.copy(generatorInstance.templatePath('../configs/csscomb.json'), generatorInstance.destinationPath('csscomb.json'))
-    fsExtra.copy(generatorInstance.templatePath('../configs/gulpfile.js'), generatorInstance.destinationPath('gulpfile.js'))
+    const globalFiles = ['.eslintrc.json', 'csscomb.json'],
+          jqueryFiles = ['gulpfile.js']
+
+    globalFiles.forEach(file =>
+      fsExtra.copy(
+        generator.templatePath(configRootPath.global + file),
+        generator.destinationPath(destPath.jquery + file)
+      )
+    )
+    jqueryFiles.forEach(file =>
+      fsExtra.copy(
+        generator.templatePath(configRootPath.jquery + file),
+        generator.destinationPath(destPath.jquery + file)
+      )
+    )
   }
   else if (frameworkName === 'VueJS') {
-    fsExtra.copy(generatorInstance.templatePath('../configs/.gitignore'), generatorInstance.destinationPath('.gitignore'))
-    fsExtra.copy(generatorInstance.templatePath('../configs/.babelrc'), generatorInstance.destinationPath('src/.babelrc'))
-    fsExtra.copy(generatorInstance.templatePath('../configs/.eslintrc.json'), generatorInstance.destinationPath('src/.eslintrc.json'))
-    fsExtra.copy(generatorInstance.templatePath('../configs/csscomb.json'), generatorInstance.destinationPath('src/csscomb.json'))
-    fsExtra.copy(generatorInstance.templatePath('../configs/gulpfile_vue.js'), generatorInstance.destinationPath('src/gulpfile.js'))
-    fsExtra.copy(generatorInstance.templatePath('../configs/webpack.config.js'), generatorInstance.destinationPath('src/webpack.config.js'))
-    fsExtra.copy(generatorInstance.templatePath('../configs/webpack.production.js'), generatorInstance.destinationPath('src/webpack.production.js'))
-    fsExtra.copy(generatorInstance.templatePath('../configs/webpack.server.js'), generatorInstance.destinationPath('src/webpack.server.js'))
+    const globalFiles = ['.eslintrc.json', 'csscomb.json'],
+          vuejsFiles = [
+            '.babelrc',
+            'gulpfile.js',
+            'webpack.config.js',
+            'webpack.production.js',
+            'webpack.server.js'
+          ]
+
+    globalFiles.forEach(file =>
+      fsExtra.copy(
+        generator.templatePath(configRootPath.global + file),
+        generator.destinationPath(destPath.vuejs + file)
+      )
+    )
+    vuejsFiles.forEach(file =>
+      fsExtra.copy(
+        generator.templatePath(configRootPath.vuejs + file),
+        generator.destinationPath(destPath.vuejs + file)
+      )
+    )
   }
 }
 

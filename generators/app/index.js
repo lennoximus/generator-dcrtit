@@ -33,6 +33,7 @@ module.exports = class extends Generator {
       }
     ]
 
+
     return this.prompt(prompts).then(props => {
       // To access props later use this.props.someAnswer;
       this.props = props
@@ -40,23 +41,21 @@ module.exports = class extends Generator {
   }
 
   writing () {
-    const frameworkName = this.props.frameworkName,
-          projectName = this.props.projectName
-
+    global.generator = this
     mkdirp('src')
-    PackageBuilder(frameworkName, projectName)
-    ConfigBundler(this, frameworkName)
-    AssetsBundler(this, frameworkName)
+    PackageBuilder()
+    ConfigBundler()
+    AssetsBundler()
   }
 
   install () {
-    if (this.props.frameworkName !== 'VueJS') {
-      this.installDependencies({
-        npm: true,
-        bower: false,
-        yarn: false
-      })
-    }
+    // If (this.props.frameworkName !== 'VueJS') {
+    //   This.installDependencies({
+    //     Npm: true,
+    //     Bower: false,
+    //     Yarn: false
+    //   })
+    // }
   }
 }
 

@@ -2,7 +2,8 @@ const mkdirp = require('mkdirp-promise'),
       chalk = require('chalk'),
       fss = require('fs'),
       path = require('path'),
-      GetColors = require('get-image-colors')
+      GetColors = require('get-image-colors'),
+      HtmlBundler = require('./html-bundler')
 
 function filterDir (startPath, filter) {
   if (!fss.existsSync(startPath)) { //eslint-disable-line
@@ -34,29 +35,41 @@ function filterDir (startPath, filter) {
   }
 }
 
-const AssetsBundler = (generatorInstance, frameworkName) => {
-  const pagesList = generatorInstance.props.pagesList.split(' '),
-        paletteArray = filterDir(generatorInstance.destinationPath(), '.png')
+const AssetsBundler = () => {
+  const generator = global.generator,
+        {projectName, frameworkName} = generator.props,
+        pagesList = generator.props.pagesList.split(' '),
+        paletteArray = filterDir(generator.destinationPath(), '.png'),
+        fontsExtentions = [
+          '.eot',
+          '.svg',
+          '.ttf',
+          '.woff'
+        ]
+  const folderNames = []
+  const fontsNames = []
+
+  // FontExts.forEach(font => {
+  //   Console.log(filterDir(generator.destinationPath(), font))
+  //   FilterDir(generator.destinationPath(), font).forEach(fontFile => {
+  //     Const fontName = fontFile.split('.')[0].split('-')[0],
+  //     FolderName = fontFile.split('.')[0].split('-')[fontFile.split('.')[0].split('-').length - 1]
+  //
+  //     If (!folderNames.includes(folderName)) {
+  //       FolderNames.push(folderName)
+  //     }
+  //     If (!fontsNames.includes(fontName)) {
+  //       FontsNames.push(fontName)
+  //     }
+  //   })
+  // })
+
+  HtmlBundler()
 
   if (frameworkName === 'JQuery') {
-    generatorInstance.fs.copyTpl(generatorInstance.templatePath('index.html'),
-      generatorInstance.destinationPath('src/html/index.html'),
-      {
-        title: generatorInstance.props.projectName,
-        pageName: 'main'
-      })
-    if (generatorInstance.props.pagesList.length !== 0) {
-      pagesList.forEach(page => {
-        generatorInstance.fs.copyTpl(generatorInstance.templatePath('index.html'),
-          generatorInstance.destinationPath(`src/html/${page}.html`),
-          {
-            title: generatorInstance.props.projectName,
-            pageName: page
-          })
-      })
-    }
+
     mkdirp('src/js')
-      .then(() => generatorInstance.fs.write('src/js/main.js', '$(\'document\').ready(() => {\n})'))
+      .then(() => generator.fs.write('src/js/main.js', '$(\'document\').ready(() => {\n})'))
       .catch(error => {
         console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgYellow('javascript ')}folder: ${chalk.red(error)}`)
       })
@@ -77,37 +90,37 @@ const AssetsBundler = (generatorInstance, frameworkName) => {
       .then(() => {
         mkdirp('src/scss/styles/pages')
         mkdirp('src/scss/vendor')
-        if (generatorInstance.props.pagesList.length !== 0) {
+        if (generator.props.pagesList.length !== 0) {
           pagesList.forEach(page => {
-            generatorInstance.fs.write(`src/scss/styles/pages/_${page}.scss`, `.p-${page} {\n\n}`)
+            generator.fs.write(`src/scss/styles/pages/_${page}.scss`, `.p-${page} {\n\n}`)
           })
         }
-        generatorInstance.fs.write('src/scss/styles/_global.scss', '* {\r\n  box-sizing: border-box;\r\n}\r\n\r\nhtml {\r\n  width: 100%;\r\n\r\n}\r\n\r\nbody {\r\n  width: 100%;\r\n}\n\n.g {\n\n}')
-        generatorInstance.fs.write('src/scss/styles/_freq.scss', '.f {\n\n}')
-        generatorInstance.fs.copy(generatorInstance.templatePath('../utils/styles'), generatorInstance.destinationPath('src/scss/utils'))
-        generatorInstance.fs.write('src/scss/index.scss', '@import \'utils\/normalize\';\r\n@import \'utils\/variables\';\r\n@import \'utils\/mixins\';\r\n@import \'utils\/fonts\';\r\n\r\n@import \'styles\/global\';\r\n@import \'styles\/freq\';\r\n')
-        if (generatorInstance.props.pagesList.length !== 0) {
+        generator.fs.write('src/scss/styles/_global.scss', '* {\r\n  box-sizing: border-box;\r\n}\r\n\r\nhtml {\r\n  width: 100%;\r\n\r\n}\r\n\r\nbody {\r\n  width: 100%;\r\n}\n\n.g {\n\n}')
+        generator.fs.write('src/scss/styles/_freq.scss', '.f {\n\n}')
+        generator.fs.copy(generator.templatePath('../utils/styles'), generator.destinationPath('src/scss/utils'))
+        generator.fs.write('src/scss/index.scss', '@import \'utils\/normalize\';\r\n@import \'utils\/variables\';\r\n@import \'utils\/mixins\';\r\n@import \'utils\/fonts\';\r\n\r\n@import \'styles\/global\';\r\n@import \'styles\/freq\';\r\n')
+        if (generator.props.pagesList.length !== 0) {
           pagesList.forEach(page => {
-            generatorInstance.fs.append('src/scss/index.scss', `@import 'styles/pages/${page}';\r\n`)
+            generator.fs.append('src/scss/index.scss', `@import 'styles/pages/${page}';\r\n`)
           })
         }
       })
       .catch(error => {
         console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgBlue('styles ')}folder: ${chalk.red(error)}`)
       })
-    if (paletteArray.length !== 0 && paletteArray !== null) {
+    if (paletteArray !== undefined && paletteArray.length !== 0) {
       paletteArray.forEach(palette => {
         GetColors(palette)
           .then(colors => {
-            generatorInstance.fs.append('src/scss/utils/_variables.scss', `$c-color: ${colors.map(color => color.hex())[0]};\r\n`)
+            generator.fs.append('src/scss/utils/_variables.scss', `$c-color: ${colors.map(color => color.hex())[0]};\r\n`)
           })
       })
     }
   }
   else if (frameworkName === 'VueJS') {
-    generatorInstance.fs.copyTpl(generatorInstance.templatePath('vuejs/index_vue.html'),
-      generatorInstance.destinationPath('src/html/index.html'),
-      {title: generatorInstance.props.projectName})
+    generator.fs.copyTpl(generator.templatePath('vuejs/index_vue.html'),
+      generator.destinationPath('src/html/index.html'),
+      {title: generator.props.projectName})
     mkdirp('src/js')
       .then(() => {
         mkdirp('src/js/client/components/common')
@@ -115,23 +128,23 @@ const AssetsBundler = (generatorInstance, frameworkName) => {
         mkdirp('src/js/client/router')
         mkdirp('src/js/client/store')
         mkdirp('src/js/client/')
-        generatorInstance.fs.copy(generatorInstance.templatePath('vuejs/store'), generatorInstance.destinationPath('src/js/client/store'))
-        generatorInstance.fs.copy(generatorInstance.templatePath('vuejs/index.js'), generatorInstance.destinationPath('src/js/client/index.js'))
-        generatorInstance.fs.copy(generatorInstance.templatePath('vuejs/polyfill.js'), generatorInstance.destinationPath('src/js/client/polyfill.js'))
-        generatorInstance.fs.copy(generatorInstance.templatePath('vuejs/components/Index.vue'), generatorInstance.destinationPath('src/js/client/components/App.vue'))
-        if (generatorInstance.props.pagesList.length !== 0) {
+        generator.fs.copy(generator.templatePath('vuejs/store'), generator.destinationPath('src/js/client/store'))
+        generator.fs.copy(generator.templatePath('vuejs/index.js'), generator.destinationPath('src/js/client/index.js'))
+        generator.fs.copy(generator.templatePath('vuejs/polyfill.js'), generator.destinationPath('src/js/client/polyfill.js'))
+        generator.fs.copy(generator.templatePath('vuejs/components/Index.vue'), generator.destinationPath('src/js/client/components/App.vue'))
+        if (generator.props.pagesList.length !== 0) {
           pagesList.forEach(page => {
-            generatorInstance.fs.copyTpl(generatorInstance.templatePath('vuejs/components/Page.vue'),
-              generatorInstance.destinationPath(`src/js/client/components/pages/${page}.vue`),
+            generator.fs.copyTpl(generator.templatePath('vuejs/components/Page.vue'),
+              generator.destinationPath(`src/js/client/components/pages/${page}.vue`),
               {pageName: page})
           })
-          generatorInstance.fs.copyTpl(generatorInstance.templatePath('vuejs/router/index.js'),
-            generatorInstance.destinationPath('src/js/client/router/index.js'),
+          generator.fs.copyTpl(generator.templatePath('vuejs/router/index.js'),
+            generator.destinationPath('src/js/client/router/index.js'),
             {pages: pagesList})
         }
         else {
-          generatorInstance.fs.copyTpl(generatorInstance.templatePath('vuejs/router/index.js'),
-            generatorInstance.destinationPath('src/js/client/router/index.js'),
+          generator.fs.copyTpl(generator.templatePath('vuejs/router/index.js'),
+            generator.destinationPath('src/js/client/router/index.js'),
             {pages: ''})
         }
       })
@@ -155,29 +168,29 @@ const AssetsBundler = (generatorInstance, frameworkName) => {
       .then(() => {
         mkdirp('src/scss/styles/pages')
         mkdirp('src/scss/vendor')
-        if (generatorInstance.props.pagesList.length !== 0) {
+        if (generator.props.pagesList.length !== 0) {
           pagesList.forEach(page => {
-            generatorInstance.fs.write(`src/scss/styles/pages/_${page}.scss`, `.p-${page} {\n\n}`)
+            generator.fs.write(`src/scss/styles/pages/_${page}.scss`, `.p-${page} {\n\n}`)
           })
         }
-        generatorInstance.fs.write('src/scss/styles/_global.scss', '* {\r\n  box-sizing: border-box;\r\n}\r\n\r\nhtml {\r\n  width: 100%;\r\n\r\n}\r\n\r\nbody {\r\n  width: 100%;\r\n}\n\n.g {\n\n}')
-        generatorInstance.fs.write('src/scss/styles/_freq.scss', '.f {\n\n}')
-        generatorInstance.fs.copy(generatorInstance.templatePath('../utils/styles'), generatorInstance.destinationPath('src/scss/utils'))
-        generatorInstance.fs.write('src/scss/index.scss', '@import \'utils\/normalize\';\r\n@import \'utils\/variables\';\r\n@import \'utils\/mixins\';\r\n@import \'utils\/fonts\';\r\n\r\n@import \'styles\/global\';\r\n@import \'styles\/freq\';')
-        if (generatorInstance.props.pagesList.length !== 0) {
+        generator.fs.write('src/scss/styles/_global.scss', '* {\r\n  box-sizing: border-box;\r\n}\r\n\r\nhtml {\r\n  width: 100%;\r\n\r\n}\r\n\r\nbody {\r\n  width: 100%;\r\n}\n\n.g {\n\n}')
+        generator.fs.write('src/scss/styles/_freq.scss', '.f {\n\n}')
+        generator.fs.copy(generator.templatePath('../utils/styles'), generator.destinationPath('src/scss/utils'))
+        generator.fs.write('src/scss/index.scss', '@import \'utils\/normalize\';\r\n@import \'utils\/variables\';\r\n@import \'utils\/mixins\';\r\n@import \'utils\/fonts\';\r\n\r\n@import \'styles\/global\';\r\n@import \'styles\/freq\';')
+        if (generator.props.pagesList.length !== 0) {
           pagesList.forEach(page => {
-            generatorInstance.fs.append('src/scss/index.scss', `@import 'styles/pages/${page}';\r\n`)
+            generator.fs.append('src/scss/index.scss', `@import 'styles/pages/${page}';\r\n`)
           })
         }
       })
       .catch(error => {
         console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgBlue('styles ')}folder: ${chalk.red(error)}`)
       })
-    if (paletteArray.length !== 0 && paletteArray !== null) {
+    if (paletteArray !== undefined && paletteArray.length !== 0) {
       paletteArray.forEach(palette => {
         GetColors(palette)
           .then(colors => {
-            generatorInstance.fs.append('src/scss/utils/_variables.scss', `$c-color: ${colors.map(color => color.hex())[0]};\r\n`)
+            generator.fs.append('src/scss/utils/_variables.scss', `$c-color: ${colors.map(color => color.hex())[0]};\r\n`)
           })
       })
     }
