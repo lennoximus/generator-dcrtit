@@ -2,57 +2,42 @@ const fsExtra = require('fs-extra')
 
 const ConfigBundler = () => {
   const generator = global.generator,
-        {frameworkName} = generator.props,
-        configRootPath = {
-          global: '../configs/global/',
-          jquery: '../configs/jquery/',
-          vuejs: '../configs/vuejs/'
-        },
-        destPath = {
-          jquery: '',
-          vuejs: 'src/'
-        }
+        {frameworkName} = generator.props
 
-  fsExtra.copy(generator.templatePath(`${configRootPath.global}.gitignore`), generator.destinationPath('.gitignore'))
+  fsExtra.copy(generator.templatePath('../configs/.gitignore'), generator.destinationPath('.gitignore'))
   if (frameworkName === 'JQuery') {
-    const globalFiles = ['.eslintrc.json', 'csscomb.json'],
-          jqueryFiles = ['gulpfile.js']
-
-    globalFiles.forEach(file =>
-      fsExtra.copy(
-        generator.templatePath(configRootPath.global + file),
-        generator.destinationPath(destPath.jquery + file)
-      )
+    fsExtra.copy(
+      generator.templatePath('../configs/global/'),
+      generator.destinationPath()
     )
-    jqueryFiles.forEach(file =>
-      fsExtra.copy(
-        generator.templatePath(configRootPath.jquery + file),
-        generator.destinationPath(destPath.jquery + file)
-      )
+    fsExtra.copy(
+      generator.templatePath('../configs/jquery/'),
+      generator.destinationPath('')
     )
   }
   else if (frameworkName === 'VueJS') {
-    const globalFiles = ['.eslintrc.json', 'csscomb.json'],
-          vuejsFiles = [
-            '.babelrc',
-            'gulpfile.js',
-            'webpack.config.js',
-            'webpack.production.js',
-            'webpack.server.js'
-          ]
+    const {bundleType} = generator.props
 
-    globalFiles.forEach(file =>
+    if (bundleType === 'Single bundle (No SSR)') {
       fsExtra.copy(
-        generator.templatePath(configRootPath.global + file),
-        generator.destinationPath(destPath.vuejs + file)
+        generator.templatePath('../configs/global/'),
+        generator.destinationPath('src')
       )
-    )
-    vuejsFiles.forEach(file =>
       fsExtra.copy(
-        generator.templatePath(configRootPath.vuejs + file),
-        generator.destinationPath(destPath.vuejs + file)
+        generator.templatePath('../configs/vuejs/sb-no-ssr'),
+        generator.destinationPath('src')
       )
-    )
+    }
+    else if (bundleType === 'Single bundle (With SSR)') {
+      fsExtra.copy(
+        generator.templatePath('../configs/global/'),
+        generator.destinationPath('src')
+      )
+      fsExtra.copy(
+        generator.templatePath('../configs/vuejs/sb-ssr'),
+        generator.destinationPath('src')
+      )
+    }
   }
 }
 

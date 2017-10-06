@@ -10,8 +10,9 @@ module.exports = class extends Generator {
   prompting () {
     // Have Yeoman greet the user.
     this.log(yosay(
-      `Welcome to the wondrous ${chalk.red('dcrtit')} generator!`
+      `Welcome to the wondrous ${chalk.red('dcrtit')} generator!\n\r\n\r`
     ))
+    this.log('Remember to do something here is the place for your addition instructions.')
 
     const prompts = [
       {
@@ -27,7 +28,7 @@ module.exports = class extends Generator {
         choices: ['JQuery', 'VueJS']
       },
       {
-        when: 'frameworkName.VueJS',
+        when (props) {return props.frameworkName === 'VueJS'},
         type: 'list',
         name: 'bundleType',
         message: 'Specify application and bundle configuration.',

@@ -1,4 +1,6 @@
-const GetColors = require('get-image-colors')
+const GetColors = require('get-image-colors'),
+      fss = require('fs'),
+      path = require('path')
 
 function filterDir (startPath, filter) {
   if (!fss.existsSync(startPath)) { //eslint-disable-line
@@ -32,15 +34,32 @@ function filterDir (startPath, filter) {
 
 const PaletteReceiver = () => {
   const generator = global.generator,
+        {projectName, frameworkName} = generator.props,
         paletteArray = filterDir(generator.destinationPath(), '.png')
 
-  if (paletteArray !== undefined && paletteArray.length !== 0) {
-    paletteArray.forEach(palette => {
-      GetColors(palette)
-        .then(colors => {
-          generator.fs.append('src/scss/utils/_variables.scss', `$c-color: ${colors.map(color => color.hex())[0]};\r\n`)
+  if (frameworkName === 'JQuery') {
+    if (paletteArray !== undefined && paletteArray.length !== 0) {
+      paletteArray.forEach(palette => {
+        GetColors(palette)
+          .then(colors => {
+            generator.fs.append('src/scss/utils/_variables.scss', `$c-color: ${colors.map(color => color.hex())[0]};\r\n`)
+          })
+      })
+    }
+  }
+  else if (frameworkName === 'VueJS') {
+    const {bundleType} = generator.props
+
+    if (bundleType === 'Single bundle (No SSR)') {
+      if (paletteArray !== undefined && paletteArray.length !== 0) {
+        paletteArray.forEach(palette => {
+          GetColors(palette)
+            .then(colors => {
+              generator.fs.append('src/scss/utils/_variables.scss', `$c-color: ${colors.map(color => color.hex())[0]};\r\n`)
+            })
         })
-    })
+      }
+    }
   }
 }
 

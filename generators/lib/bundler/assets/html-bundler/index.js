@@ -2,22 +2,19 @@ const HtmlBundler = () => {
   const generator = global.generator,
         {projectName, frameworkName} = generator.props,
         pagesLength = generator.props.pagesList.length,
-        pages = generator.props.pagesList.split(' '),
-        destPath = 'src/html/'
+        pages = generator.props.pagesList.split(' ')
 
   if (frameworkName === 'JQuery') {
-    const tempPath = 'jquery/'
-
-    generator.fs.copyTpl(generator.templatePath(`${tempPath}index.html`),
-      generator.destinationPath(`${destPath}index.html`),
+    generator.fs.copyTpl(generator.templatePath('jquery/index.html'),
+      generator.destinationPath('src/html/index.html'),
       {
         title: projectName,
         pageName: 'main'
       })
     if (pagesLength !== 0) {
       pages.forEach(page => {
-        generator.fs.copyTpl(generator.templatePath(`${tempPath}index.html`),
-          generator.destinationPath(`${destPath + page}.html`),
+        generator.fs.copyTpl(generator.templatePath('jquery/index.html'),
+          generator.destinationPath(`src/html/${page}.html`),
           {
             title: projectName,
             pageName: page
@@ -26,11 +23,14 @@ const HtmlBundler = () => {
     }
   }
   else if (frameworkName === 'VueJS') {
-    const tempPath = 'vuejs/'
+    const {bundleType} = generator.props
 
-    generator.fs.copyTpl(generator.templatePath(`${tempPath}index.html`),
-      generator.destinationPath(`${destPath}index.html`),
-      {title: projectName})
+    if (bundleType === 'Single bundle (No SSR)') {
+      generator.fs.copyTpl(generator.templatePath('vuejs/sb-no-ssr/index.html'),
+        generator.destinationPath('src/html/index.html'),
+        {title: projectName}
+      )
+    }
   }
 }
 

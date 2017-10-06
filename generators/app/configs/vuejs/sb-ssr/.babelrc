@@ -1,0 +1,33 @@
+{
+  "env": {
+    "production": {
+      "presets": [
+        [
+          "es2015",
+          {
+            "modules": false
+          }
+        ],
+        "stage-0"
+      ],
+      "plugins": [
+        "transform-runtime"
+      ],
+      "minified": true
+    },
+    "development": {
+      "presets": [
+        [
+          "es2015",
+          {
+            "modules": false
+          }
+        ],
+        "stage-0"
+      ],
+      "plugins": [
+        "transform-runtime"
+      ]
+    }
+  }
+}

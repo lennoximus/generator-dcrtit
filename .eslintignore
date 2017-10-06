@@ -1,4 +1,4 @@
 coverage
 **/templates
 /node_modules/
-/generators/app/templates/vuejs/router/index.js
+/generators/app/templates/vuejs/sb-no-ssr/router/index.js
