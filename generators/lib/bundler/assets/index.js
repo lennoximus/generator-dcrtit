@@ -2,44 +2,15 @@ const mkdirp = require('mkdirp-promise'),
       chalk = require('chalk'),
       fss = require('fs'),
       path = require('path'),
-      GetColors = require('get-image-colors'),
-      HtmlBundler = require('./html-bundler')
-
-function filterDir (startPath, filter) {
-  if (!fss.existsSync(startPath)) { //eslint-disable-line
-    console.log('No such directory found:', startPath)
-
-    return
-  }
-
-  const files = fss.readdirSync(startPath) //eslint-disable-line
-  const resultArray = []
-
-  for (let i = 0; i < files.length; i++) {
-    const filename = path.join(startPath, files[i])
-    const stat = fss.lstatSync(filename) //eslint-disable-line
-
-    if (stat.isDirectory()) {
-      filterDir(filename, filter) // Recurse
-    }
-    else if (filename.indexOf(filter) >= 0) {
-      // Console.log('-- found: ', filename.split('\\'))
-      const pathArray = filename.split('\\')
-
-      resultArray.push(pathArray[pathArray.length - 1])
-    }
-  }
-
-  if (resultArray.length !== 0) {
-    return resultArray
-  }
-}
+      HtmlBundler = require('./html-bundler'),
+      PaletteReceiver = require('./palette-receiver'),
+      JsBundler = require('./js-bundler'),
+      StaticBundler = require('./static-bundler')
 
 const AssetsBundler = () => {
   const generator = global.generator,
         {projectName, frameworkName} = generator.props,
         pagesList = generator.props.pagesList.split(' '),
-        paletteArray = filterDir(generator.destinationPath(), '.png'),
         fontsExtentions = [
           '.eot',
           '.svg',
@@ -65,14 +36,11 @@ const AssetsBundler = () => {
   // })
 
   HtmlBundler()
+  JsBundler()
+  StaticBundler()
+  PaletteReceiver()
 
   if (frameworkName === 'JQuery') {
-
-    mkdirp('src/js')
-      .then(() => generator.fs.write('src/js/main.js', '$(\'document\').ready(() => {\n})'))
-      .catch(error => {
-        console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgYellow('javascript ')}folder: ${chalk.red(error)}`)
-      })
     mkdirp('src/img/fish')
       .then()
       .catch(error => {
@@ -108,49 +76,8 @@ const AssetsBundler = () => {
       .catch(error => {
         console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgBlue('styles ')}folder: ${chalk.red(error)}`)
       })
-    if (paletteArray !== undefined && paletteArray.length !== 0) {
-      paletteArray.forEach(palette => {
-        GetColors(palette)
-          .then(colors => {
-            generator.fs.append('src/scss/utils/_variables.scss', `$c-color: ${colors.map(color => color.hex())[0]};\r\n`)
-          })
-      })
-    }
   }
   else if (frameworkName === 'VueJS') {
-    generator.fs.copyTpl(generator.templatePath('vuejs/index_vue.html'),
-      generator.destinationPath('src/html/index.html'),
-      {title: generator.props.projectName})
-    mkdirp('src/js')
-      .then(() => {
-        mkdirp('src/js/client/components/common')
-        mkdirp('src/js/client/components/pages')
-        mkdirp('src/js/client/router')
-        mkdirp('src/js/client/store')
-        mkdirp('src/js/client/')
-        generator.fs.copy(generator.templatePath('vuejs/store'), generator.destinationPath('src/js/client/store'))
-        generator.fs.copy(generator.templatePath('vuejs/index.js'), generator.destinationPath('src/js/client/index.js'))
-        generator.fs.copy(generator.templatePath('vuejs/polyfill.js'), generator.destinationPath('src/js/client/polyfill.js'))
-        generator.fs.copy(generator.templatePath('vuejs/components/Index.vue'), generator.destinationPath('src/js/client/components/App.vue'))
-        if (generator.props.pagesList.length !== 0) {
-          pagesList.forEach(page => {
-            generator.fs.copyTpl(generator.templatePath('vuejs/components/Page.vue'),
-              generator.destinationPath(`src/js/client/components/pages/${page}.vue`),
-              {pageName: page})
-          })
-          generator.fs.copyTpl(generator.templatePath('vuejs/router/index.js'),
-            generator.destinationPath('src/js/client/router/index.js'),
-            {pages: pagesList})
-        }
-        else {
-          generator.fs.copyTpl(generator.templatePath('vuejs/router/index.js'),
-            generator.destinationPath('src/js/client/router/index.js'),
-            {pages: ''})
-        }
-      })
-      .catch(error => {
-        console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgYellow('javascript ')}folder: ${chalk.red(error)}`)
-      })
     mkdirp('src/img/fish')
       .then()
       .catch(error => {
@@ -186,14 +113,6 @@ const AssetsBundler = () => {
       .catch(error => {
         console.error(`${chalk.bgRed('Something went wrong while generating ') + chalk.bgBlue('styles ')}folder: ${chalk.red(error)}`)
       })
-    if (paletteArray !== undefined && paletteArray.length !== 0) {
-      paletteArray.forEach(palette => {
-        GetColors(palette)
-          .then(colors => {
-            generator.fs.append('src/scss/utils/_variables.scss', `$c-color: ${colors.map(color => color.hex())[0]};\r\n`)
-          })
-      })
-    }
   }
 }
 

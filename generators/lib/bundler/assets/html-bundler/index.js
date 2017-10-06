@@ -5,12 +5,9 @@ const HtmlBundler = () => {
         pages = generator.props.pagesList.split(' '),
         destPath = 'src/html/'
 
-  let tempPath
-
-  console.log(pages, pagesLength)
-
   if (frameworkName === 'JQuery') {
-    tempPath = 'jquery/'
+    const tempPath = 'jquery/'
+
     generator.fs.copyTpl(generator.templatePath(`${tempPath}index.html`),
       generator.destinationPath(`${destPath}index.html`),
       {
@@ -27,6 +24,13 @@ const HtmlBundler = () => {
           })
       })
     }
+  }
+  else if (frameworkName === 'VueJS') {
+    const tempPath = 'vuejs/'
+
+    generator.fs.copyTpl(generator.templatePath(`${tempPath}index.html`),
+      generator.destinationPath(`${destPath}index.html`),
+      {title: projectName})
   }
 }
 

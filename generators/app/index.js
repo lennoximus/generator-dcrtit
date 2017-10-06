@@ -27,6 +27,13 @@ module.exports = class extends Generator {
         choices: ['JQuery', 'VueJS']
       },
       {
+        when: 'frameworkName.VueJS',
+        type: 'list',
+        name: 'bundleType',
+        message: 'Specify application and bundle configuration.',
+        choices: ['Single bundle (No SSR)', 'Single bundle (With SSR)', 'Multiple bundles (With SSR)']
+      },
+      {
         type: 'input',
         name: 'pagesList',
         message: 'Enter pages to generate separated by space:'
